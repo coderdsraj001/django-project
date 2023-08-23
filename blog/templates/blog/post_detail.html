@@ -3,7 +3,7 @@
 {% block content %}
     <article class="post">
         <aside class="actions">
-            <a class="btn btn-secondary" href="{% url 'post_edit' pk=post.pk %}">
+            <a class="btn btn-secondary" href="{% url 'post_edit' slug=post.slug %}">
               {% include './icons/pencil-fill.svg' %}
             </a>
         </aside>
