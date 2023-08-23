@@ -8,6 +8,7 @@
             </time>
             <h2><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }}</a></h2>
             <p>{{ post.text|linebreaksbr }}</p>
+            <p>Category: {{ post.category.name }}</p>
         </article>
     {% endfor %}
 {% endblock %}

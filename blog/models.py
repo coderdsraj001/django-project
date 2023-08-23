@@ -4,8 +4,17 @@ from django.utils import timezone
 from autoslug import AutoSlugField
 
 # Create your models here.
+class Category(models.Model):
+    name = models.CharField(max_length=60)
+    desc = models.TextField()
+    image = models.ImageField(upload_to='cat')
+
+    def __str__(self):
+        return self.name
+
 class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     text = models.TextField()
     slug = AutoSlugField(populate_from='title', unique=True, default=None, null=True)
@@ -21,3 +30,4 @@ class Post(models.Model):
 
     class Meta:
         ordering = ['-created_date',]
+

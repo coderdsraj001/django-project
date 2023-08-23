@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.utils import timezone
-from .models import Post
+from .models import Post, Category
 from django.shortcuts import render, get_object_or_404
 from .forms import PostForm
 
