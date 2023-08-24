@@ -8,6 +8,8 @@ class Category(models.Model):
     name = models.CharField(max_length=60)
     desc = models.TextField()
     image = models.ImageField(upload_to='cat')
+    slug = AutoSlugField(populate_from='name', unique=True, default=None, null=True)
+
 
     def __str__(self):
         return self.name

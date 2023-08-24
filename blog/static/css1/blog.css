@@ -7,6 +7,10 @@ h1 a, h2 a {
     font-family: 'Lobster';
 }
 
+.ft {
+    font-family: 'Lobster';
+}
+
 .page-header {
     background-color: #C25100;
     margin-top: 0;
@@ -43,14 +47,14 @@ h4 {
     width: 100%;
 }
 
-.top-menu,
-.top-menu:hover,
-.top-menu:visited {
-    color: #ffffff;
-    float: right;
-    font-size: 26pt;
-    margin-right: 20px;
-}
+    .top-menu,
+    .top-menu:hover,
+    .top-menu:visited {
+        color: #ffffff;
+        float: right;
+        font-size: 26pt;
+        margin-right: 20px;
+    }
 
 .post {
     margin-bottom: 70px;

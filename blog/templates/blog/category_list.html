@@ -1,0 +1,12 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <h2>All Categories</h2>
+    {% for category in categories %}
+        <article class="post">
+            <h2><a href="{% url 'category_wise_post' category.id %}">{{ category.name }}</a></h2>
+            <p><img src="{{category.image.url}}" width="120"/></p>
+            <p>{{ category.desc|linebreaksbr }}</p>
+        </article>
+    {% endfor %}
+{% endblock %}

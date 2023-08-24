@@ -40,3 +40,13 @@ def post_edit(request, slug):
     else:
         form = PostForm(instance=post)
     return render(request, 'blog/post_edit.html', {'form': form})
+
+def category_list(request):
+    categories = Category.objects.all().order_by('name')
+    return render(request, 'blog/category_list.html', {'categories': categories})
+
+def category_wise_post(request, pk):
+    category = Category.objects.get(pk=pk)
+    post_list = Post.objects.filter(category=category)
+    return render(request, 'blog/category_wise_post.html', {'post_list': post_list})
+

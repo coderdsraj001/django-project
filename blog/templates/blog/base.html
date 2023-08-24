@@ -8,15 +8,26 @@
         <link rel="stylesheet" href="{% static 'css1/blog.css' %}">
     </head>
     <body>
-        <header class="page-header">
+        <header class="page-header navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container">
-                <a class="btn btn-info btn-sm top-menu" href="polls/">make polls</a>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'post_new' %}" class="top-menu">
-                        {% include './icons/file-earmark-plus.svg' %}
-                    </a>
-                {% endif %}
                 <h1><a href="/">Django Girls Blog</a></h1>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ft">
+                      <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{% url 'category_list' %}">Category</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link active" href="polls/">Make Polls</a>
+                      </li>
+                      <li class="nav-item ">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'post_new' %}" class="top-menu">
+                                {% include './icons/file-earmark-plus.svg' %}
+                            </a>
+                        {% endif %}       
+                     </li>
+                    </ul>
+                </div>
             </div>
         </header>
         <main class="content container">
@@ -29,3 +40,6 @@
         </main> 
     </body>
 </html>
+
+
+
