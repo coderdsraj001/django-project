@@ -81,3 +81,11 @@ h4 {
     color: #FFFFFF;
     background-color: #C25100;
 }
+
+.rounded_img {
+    border-radius: 100% 100%;
+  }
+
+.in {
+    display:inline-block;
+}

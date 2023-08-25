@@ -1,0 +1,12 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <h2>All Tags</h2>
+    {% for tag in tags %}
+        <article class="post">
+            <h2><p><a href="{% url 'tag_wise_post' tag.id %}">{{ tag.name }}</a></p></h2>
+            <p><img src="{{tag.image.url}}" width="120"/></p>
+            <p>{{ tag.desc }}</p>
+        </article>
+    {% endfor %}
+{% endblock %}

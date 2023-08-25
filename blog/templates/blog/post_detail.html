@@ -7,9 +7,13 @@
               {% include './icons/pencil-fill.svg' %}
             </a>
         </aside>
-        <p><h2>{{ post.title }}</h2></p>
+        <p class="in">
+            <img src="{{post.thumbnail_img.url}}" class="rounded_img" width="50" height="50"/>
+            <span>{{ post.title }}</span>
+        </p>
         <p>{{ post.text|linebreaksbr }}</p>
-        <p>Category : {{ post.category.name }}</p>
-        <p><img src="{{post.category.image.url}}" width="120"/></p>
+        <p><img src="{{post.feature_img.url}}" width="1200"/></p>
+        <p><strong>Category:</strong> {{ post.category.name }}</p>
+        <p><strong>Tags:</strong> {{ post.tags.all|join:", " }}</p>
     </article>
 {% endblock %}

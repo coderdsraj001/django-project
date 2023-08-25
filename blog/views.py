@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.utils import timezone
-from .models import Post, Category
+from .models import Post, Category, Tag
 from django.shortcuts import render, get_object_or_404
 from .forms import PostForm
 
@@ -16,12 +16,13 @@ def post_detail(request, slug):
 
 def post_new(request):
     if request.method == "POST":
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
+            form.save_m2m()
             return redirect('post_detail', slug=post.slug)
     else:
         form = PostForm()
@@ -36,6 +37,7 @@ def post_edit(request, slug):
             post.author = request.user
             post.published_date = timezone.now()
             post.save()
+            form.save_m2m()
             return redirect('post_detail', slug=post.slug)
     else:
         form = PostForm(instance=post)
@@ -48,5 +50,14 @@ def category_list(request):
 def category_wise_post(request, pk):
     category = Category.objects.get(pk=pk)
     post_list = Post.objects.filter(category=category)
+    return render(request, 'blog/category_wise_post.html', {'post_list': post_list})
+
+def tags(request):
+    tags = Tag.objects.all().order_by('name')
+    return render(request, 'blog/tags.html', {'tags':tags})
+
+def tag_wise_post(request, pk):
+    tags = Tag.objects.get(pk=pk)
+    post_list = Post.objects.filter(tags=tags)
     return render(request, 'blog/category_wise_post.html', {'post_list': post_list})
 

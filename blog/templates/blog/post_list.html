@@ -6,9 +6,13 @@
             <time class="date">
                 {{ post.published_date }}
             </time>
-            <h2><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }}</a></h2>
+            <p class="in">
+                <img src="{{post.thumbnail_img.url}}" class="rounded_img" width="50" height="50"/>
+                <span><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }}</a></span>
+            </p>
             <p>{{ post.text|linebreaksbr }}</p>
-            <p>Category: {{ post.category.name }}</p>
+            <p><strong>Category:</strong> {{ post.category.name }}</p>
+            <p><strong>Tags:</strong> {{ post.tags.all|join:", " }}</p>
         </article>
     {% endfor %}
 {% endblock %}
