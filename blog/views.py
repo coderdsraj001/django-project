@@ -1,18 +1,21 @@
+import csv, os
+from django.conf import settings
 from django.shortcuts import render,redirect
 from django.utils import timezone
-from .models import Post, Category, Tag
+from datetime import datetime
+from .models import Post, Category, Tag, Comment, User
 from django.shortcuts import render, get_object_or_404
-from .forms import PostForm
+from .forms import PostForm, RegisterForm, LoginForm, CommentForm, UserForm
+from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 
 
 # Create your views here.
 def post_list(request):
     posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('-created_date')
     return render(request, 'blog/post_list.html', {'posts': posts})
-
-def post_detail(request, slug):
-    post = get_object_or_404(Post, slug=slug)
-    return render(request, 'blog/post_detail.html', {'post': post})
 
 def post_new(request):
     if request.method == "POST":
@@ -61,3 +64,110 @@ def tag_wise_post(request, pk):
     post_list = Post.objects.filter(tags=tags)
     return render(request, 'blog/category_wise_post.html', {'post_list': post_list})
 
+def register(request):
+    form = RegisterForm()
+    if request.method == 'POST':
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            user = authenticate(
+                    email=form.cleaned_data['email'],
+                    password=form.cleaned_data['password1'],
+                )
+            if user is not None:
+                login(request, user)
+                return redirect('post_list')
+        return render(request, 'blog/register.html', {'form':form})
+    else:
+        return render(request, 'blog/register.html', {'form':form})
+
+def user_login(request):
+    form = LoginForm()
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1'],
+            )
+            if user is not None:
+                login(request, user)
+                messages.success(request, f' welcome {user} !!')
+                return redirect('post_list')
+            else:
+                messages.info(request, f'account done not exit plz sign in')
+            return render(request, 'blog/login.html', {'form':form})
+    else:
+        return render(request, 'blog/login.html', {'form':form})
+
+def user_logout(request):
+    logout(request)
+    return redirect('post_list')
+
+def post_detail(request, slug):
+    post = get_object_or_404(Post, slug=slug)
+    comments = post.comments.filter(active=True, parent__isnull=True).order_by('-commented_date')
+    if request.method == 'POST':
+        comment_form = CommentForm(data=request.POST)
+        if comment_form.is_valid():
+            parent_obj = None
+            try:
+                parent_id = int(request.POST.get('parent_id'))
+            except:
+                parent_id = None
+            if parent_id:
+                parent_obj = Comment.objects.get(id=parent_id)
+                if parent_obj:
+                    replay_comment = comment_form.save(commit=False)
+                    replay_comment.parent = parent_obj
+            new_comment = comment_form.save(commit=False)
+            
+            new_comment.post = post
+            new_comment.save()
+            return redirect(f'/post/{post.slug}')
+    else:
+        comment_form = CommentForm()
+    return render(request,
+                  'blog/post_detail.html',
+                  {'post': post,
+                   'comments': comments,
+                   'comment_form': comment_form})
+
+def user_profile(request):
+    user = request.user
+    return render(request, 'blog/user_profile.html', {'user':user})
+
+def update_profile(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if request.method == "POST":
+        form = UserForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.author = request.user
+            user.save()
+            return redirect('user_profile')
+    else:
+        form = UserForm(instance=request.user)
+        return render(request, 'blog/update_profile.html', {'form':form})
+
+def export(request):
+    # Generate a unique filename (e.g., timestamp or random string)
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+    unique_filename = f'user_{timestamp}.csv'
+
+    # Define the file path where the CSV will be stored on the server
+    file_path = os.path.join(settings.MEDIA_ROOT, unique_filename)
+
+    # Create and write the CSV file
+    with open(file_path, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['first_name', 'last_name', 'email', 'gender', 'date_of_birth', 'phone_no', 'city', 'state', 'country'])
+        for user in User.objects.all().values_list('first_name', 'last_name', 'email', 'gender', 'date_of_birth', 'phone_no', 'city', 'state', 'country'):
+            writer.writerow(user)
+
+    # Serve the file for download
+    with open(file_path, 'rb') as file:
+        response = HttpResponse(file.read(), content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="user.csv"'
+
+    return response

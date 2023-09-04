@@ -11,9 +11,67 @@
             <img src="{{post.thumbnail_img.url}}" class="rounded_img" width="50" height="50"/>
             <span>{{ post.title }}</span>
         </p>
+        <p class="card-text" >Author : {{post.author.first_name}}</p>
         <p>{{ post.text|linebreaksbr }}</p>
         <p><img src="{{post.feature_img.url}}" width="1200"/></p>
         <p><strong>Category:</strong> {{ post.category.name }}</p>
         <p><strong>Tags:</strong> {{ post.tags.all|join:", " }}</p>
     </article>
+
+<!-- comment section -->
+
+<!-- Comments Form -->
+<h2>Add a new comment</h2>
+<form action="." method="post">
+    {{ comment_form.as_p }}
+    {% csrf_token %}
+    <button type="submit">Add comment</button>
+</form>
+
+<!-- Comment with nested comments -->
+{% for comment in comments %}
+<div class="comment" >
+    <p class="info" style="margin: 0px;">{{ comment.name }} | {{ comment.commented_date }}</p>
+    {{ comment.comment_content|linebreaks }}
+
+    {% for replay in comment.replies.all %}
+    <p class="info" style="margin: 0px 26px;">{{ replay.name }} | {{ replay.commented_date }}</p>
+    <li style="list-style-type: none; margin-left: 30px;">{{ replay.comment_content }}</li>
+    {% endfor %}
+
+
+    <button type="button" class="collapsible" style="margin-left: 0px;">Reply</button>
+    <div class="content">
+        <form action="." method="post">
+            {{ comment_form.as_p }}
+            {% csrf_token %}
+            <!-- Hidden input for parent comment.id -->
+            <input type="hidden" name="parent_id" value="{{ comment.id }}">
+            <input class="btn btn-primary" type="submit" value="Replay">
+
+        </form>
+    </div>
+</div>
+{% empty %}
+<h4>There are no comments yet.</h4>
+{% endfor %}
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
+
+<!-- end comment section -->
 {% endblock %}

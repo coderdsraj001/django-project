@@ -1,0 +1,16 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+{% block content %}
+        <article class="post">
+            <h2>Author Detail</h2>
+            <img src="{{post_author.user_img.url}}" alt="pic">
+            <p>Name : {{postauthor.first_name}}</p>
+            <p>Email : {{postauthor.email}}</p>
+            <p>Gender : {{postauthor.gender}}</p>
+            <p>DOB : {{postauthor.dob}}</p>
+            <p>Phone Number : {{postauthor.phone_no}}</p>
+            <p>City : {{postauthor.city}}</p>
+            <p>State : {{postauthor.state}}</p>
+        </article>
+{% endblock %}
+
