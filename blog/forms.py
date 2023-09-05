@@ -17,7 +17,7 @@ class RegisterForm(UserCreationForm):
     date_of_birth = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     class Meta:
         model = User
-        fields = ['username','first_name','last_name','password1','password2','email','phone_no','gender','date_of_birth','user_img','company','city','state','country','user_web','user_address','rule']        
+        fields = ['user_img','username','first_name','last_name','password1','password2','email','phone_no','gender','date_of_birth','company','city','state','country','user_web','user_address','rule']        
 
 class LoginForm(forms.Form):
     username = forms.CharField(label='Please Enter email or username')

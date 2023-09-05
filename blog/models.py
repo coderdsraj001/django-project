@@ -4,7 +4,7 @@ from django.utils import timezone
 from autoslug import AutoSlugField
 from django.urls import reverse
 from django.contrib.auth.models import AbstractUser
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 SEX_CHOICES = (
     ('F', 'Female',),
@@ -18,14 +18,14 @@ RULE_CHOICES = (
 # Create your models here.
 
 class User(AbstractUser):
-    phone_no = models.CharField(max_length = 10, null=True,blank=True)
+    phone_no = models.PositiveIntegerField(validators=[MaxValueValidator(9999999999)], null=True,blank=True)
     gender = models.CharField(max_length=1,choices=SEX_CHOICES,)
     date_of_birth = models.DateField(null=True)
     company = models.CharField(max_length=100,null=True,blank=True)
     city = models.CharField(max_length=30)
     state = models.CharField(max_length=30)
     country = models.CharField(max_length=30)
-    user_img = models.ImageField(upload_to='user_img', blank=True, null=True)
+    user_img = models.ImageField(upload_to='UserImg', blank=True, null=True)
     user_web =  models.URLField(max_length=250,null=True,blank=True)
     user_address = models.CharField(max_length=300) 
     rule = models.CharField(max_length=1,choices=RULE_CHOICES, null=True,blank=True)

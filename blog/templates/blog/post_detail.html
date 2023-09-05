@@ -3,9 +3,11 @@
 {% block content %}
     <article class="post">
         <aside class="actions">
+          {% if post.author == request.user %}
             <a class="btn btn-secondary" href="{% url 'post_edit' slug=post.slug %}">
               {% include './icons/pencil-fill.svg' %}
             </a>
+          {% endif %}
         </aside>
         <p class="in">
             <img src="{{post.thumbnail_img.url}}" class="rounded_img" width="50" height="50"/>
@@ -39,9 +41,9 @@
     <li style="list-style-type: none; margin-left: 30px;">{{ replay.comment_content }}</li>
     {% endfor %}
 
-
     <button type="button" class="collapsible" style="margin-left: 0px;">Reply</button>
-    <div class="content">
+
+    <div class="content" style="display: none;">
         <form action="." method="post">
             {{ comment_form.as_p }}
             {% csrf_token %}

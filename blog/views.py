@@ -26,6 +26,7 @@ def post_new(request):
             post.published_date = timezone.now()
             post.save()
             form.save_m2m()
+            messages.success(request, f'You are post created succesfully.')
             return redirect('post_detail', slug=post.slug)
     else:
         form = PostForm()
@@ -33,6 +34,8 @@ def post_new(request):
 
 def post_edit(request, slug):
     post = get_object_or_404(Post, slug=slug)
+    if post.author != request.user:
+      return HttpResponse("You havn't access.")
     if request.method == "POST":
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
@@ -41,6 +44,7 @@ def post_edit(request, slug):
             post.published_date = timezone.now()
             post.save()
             form.save_m2m()
+            messages.success(request, f'Your post updated succesfully.')
             return redirect('post_detail', slug=post.slug)
     else:
         form = PostForm(instance=post)
@@ -71,12 +75,13 @@ def register(request):
         if form.is_valid():
             form.save()
             user = authenticate(
-                    email=form.cleaned_data['email'],
+                    username=form.cleaned_data['username'],
                     password=form.cleaned_data['password1'],
                 )
             if user is not None:
                 login(request, user)
-                return redirect('post_list')
+                messages.success(request, f' Your Account created and Now you are logged in succesfully.')
+                return redirect('/')
         return render(request, 'blog/register.html', {'form':form})
     else:
         return render(request, 'blog/register.html', {'form':form})
@@ -86,22 +91,37 @@ def user_login(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            user = authenticate(
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password1'],
-            )
+            name=form.cleaned_data['username']
+            password=form.cleaned_data['password1']
+            try:
+                try:
+                    user = authenticate(
+                        username=User.objects.get(username=name),
+                        password=password,
+                    )
+                except:
+                    user = authenticate(
+                        username=User.objects.get(email__exact=name),
+                        password=password,
+                    )
+            except Exception as e:
+                return render(request, 'blog/login.html', {'form':form})
             if user is not None:
                 login(request, user)
-                messages.success(request, f' welcome {user} !!')
+                messages.success(request, f' You are logged in succesfully.')
                 return redirect('post_list')
             else:
                 messages.info(request, f'account done not exit plz sign in')
             return render(request, 'blog/login.html', {'form':form})
+        else:
+            for msg in form.error_messages:
+                messages.error(request, f"{msg}: {form.error_messages[msg]}")
     else:
         return render(request, 'blog/login.html', {'form':form})
 
 def user_logout(request):
     logout(request)
+    messages.success(request, f'You are logged out succesfully.')
     return redirect('post_list')
 
 def post_detail(request, slug):
@@ -145,10 +165,11 @@ def update_profile(request, pk):
             user = form.save(commit=False)
             user.author = request.user
             user.save()
+            messages.success(request, f'User Details updated succesfully.')
             return redirect('user_profile')
     else:
         form = UserForm(instance=request.user)
-        return render(request, 'blog/update_profile.html', {'form':form})
+    return render(request, 'blog/update_profile.html', {'form':form})
 
 def export(request):
     # Generate a unique filename (e.g., timestamp or random string)
