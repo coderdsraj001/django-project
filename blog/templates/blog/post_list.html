@@ -1,18 +1,36 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-    {% for post in posts %}
-        <article class="post">
-            <time class="date">
-                {{ post.published_date }}
-            </time>
-            <p class="in">
-                <img src="{{post.thumbnail_img.url}}" class="rounded_img" width="50" height="50"/>
-                <span><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }}</a></span>
-            </p>
-            <p>{{ post.text|linebreaksbr }}</p>
-            <p><strong>Category:</strong> {{ post.category.name }}</p>
-            <p><strong>Tags:</strong> {{ post.tags.all|join:", " }}</p>
-        </article>
-    {% endfor %}
+    <div class='row card-group'>
+        {% for post in posts %}
+          <div class="col-4 mb-3">
+            <div class="card h-100">
+              <embed
+                src="{{post.thumbnail_img.url}}" width="450" height="300"
+                class="card-img-top"
+                alt="..."
+              />
+                <div class="card-body">
+                    <h5 class="card-title"><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }}</a></h5>
+                    <p class="card-text">{{ post.text|slice:250 }}...</p>
+                    <p><strong>Category:</strong> {{ post.category.name }}</p>
+                    <p><strong>Tags:</strong> {{ post.tags.all|join:", " }}</p>
+                    <p class="in">
+                    {% if post.author.user_img %}
+                        <img src="{{post.author.user_img.url}}" class="rounded_img" width="50" height="50"/>
+                    {% endif %}
+                    {% if post.author == request.user %}
+                    <span><a href="{% url 'user_profile' %}">{{ post.author.first_name }}</a></span>
+                    {% else %}
+                        <span>{{ post.author.first_name }}</span>
+                    {% endif %}
+                </p>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">{{ post.published_date }}</small>
+                </div>
+            </div>
+          </div>
+        {% endfor %}
+    </div>
 {% endblock %}

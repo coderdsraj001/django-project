@@ -28,16 +28,17 @@ def post_new(request):
             form.save_m2m()
             messages.success(request, f'You are post created succesfully.')
             return redirect('post_detail', slug=post.slug)
+        else:
+            messages.error(request, f'There is something went wrong.')
+            return render(request, 'blog/post_new.html', {'form': form})
     else:
         form = PostForm()
     return render(request, 'blog/post_edit.html', {'form': form})
 
 def post_edit(request, slug):
     post = get_object_or_404(Post, slug=slug)
-    if post.author != request.user:
-      return HttpResponse("You havn't access.")
     if request.method == "POST":
-        form = PostForm(request.POST, instance=post)
+        form = PostForm(request.POST, request.FILES, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
@@ -66,7 +67,7 @@ def tags(request):
 def tag_wise_post(request, pk):
     tags = Tag.objects.get(pk=pk)
     post_list = Post.objects.filter(tags=tags)
-    return render(request, 'blog/category_wise_post.html', {'post_list': post_list})
+    return render(request, 'blog/tag_wise_post.html', {'post_list': post_list})
 
 def register(request):
     form = RegisterForm()
@@ -81,7 +82,7 @@ def register(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f' Your Account created and Now you are logged in succesfully.')
-                return redirect('/')
+                return redirect('post_list')
         return render(request, 'blog/register.html', {'form':form})
     else:
         return render(request, 'blog/register.html', {'form':form})
@@ -105,17 +106,18 @@ def user_login(request):
                         password=password,
                     )
             except Exception as e:
+                messages.error(request, f'{e}')
                 return render(request, 'blog/login.html', {'form':form})
             if user is not None:
                 login(request, user)
                 messages.success(request, f' You are logged in succesfully.')
                 return redirect('post_list')
             else:
-                messages.info(request, f'account done not exit plz sign in')
-            return render(request, 'blog/login.html', {'form':form})
+                messages.error(request, f'There is something went wrong.')
+                return render(request, 'blog/login.html', {'form':form})
         else:
-            for msg in form.error_messages:
-                messages.error(request, f"{msg}: {form.error_messages[msg]}")
+            messages.error(request, f'There is something went wrong.')
+            return render(request, 'blog/login.html', {'form':form})
     else:
         return render(request, 'blog/login.html', {'form':form})
 

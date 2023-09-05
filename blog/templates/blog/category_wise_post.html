@@ -3,13 +3,15 @@
 {% block content %}
     {% for post in post_list %}
         <article class="post">
-            <time class="date">
-                {{ post.published_date }}
-            </time>
-            <h2><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }}</a></h2>
-            <p>{{ post.text|linebreaksbr }}</p>
-            <p><strong>Category:</strong> {{ post.category.name }}</p>
-            <p><strong>Tags:</strong> {{ post.tags.all|join:", " }}</p>
+            <div class="card mb-3">
+                <div class="card-body">
+                <h2  class="card-title"><a href="{% url 'post_detail' slug=post.slug %}">{{ post.title }}</a></h2>
+                <p class="card-text">{{ post.text|linebreaksbr }}.</p>
+                <p><strong>Category:</strong> {{ post.category.name }}</p>
+                <p><strong>Tags:</strong> {{ post.tags.all|join:", " }}</p>
+                <p class="card-text"><small class="text-body-secondary">{{ post.published_date }}</small></p>
+            </div>
+        </div>
         </article>
     {% endfor %}
 {% endblock %}

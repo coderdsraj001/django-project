@@ -1,7 +1,11 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
-    <article class="post">
+<article class="post">
+  <div class="card mb-3">
+      <img src="{{post.thumbnail_img.url}}" width="450" height="300" class="card-img-top" alt="...">
+        <div class="card-body">
+        <h5 class="card-title">{{ post.title }}</h5>
         <aside class="actions">
           {% if post.author == request.user %}
             <a class="btn btn-secondary" href="{% url 'post_edit' slug=post.slug %}">
@@ -9,17 +13,23 @@
             </a>
           {% endif %}
         </aside>
-        <p class="in">
-            <img src="{{post.thumbnail_img.url}}" class="rounded_img" width="50" height="50"/>
-            <span>{{ post.title }}</span>
-        </p>
-        <p class="card-text" >Author : {{post.author.first_name}}</p>
-        <p>{{ post.text|linebreaksbr }}</p>
-        <p><img src="{{post.feature_img.url}}" width="1200"/></p>
+        <p class="card-text">{{ post.text|linebreaksbr }}.</p>
+        <p class="card-text"><small class="text-body-secondary">{{ post.published_date }}</small></p>
         <p><strong>Category:</strong> {{ post.category.name }}</p>
         <p><strong>Tags:</strong> {{ post.tags.all|join:", " }}</p>
-    </article>
-
+        <p class="in">
+          {% if post.author.user_img %}
+              <img src="{{post.author.user_img.url}}" class="rounded_img" width="50" height="50"/>
+          {% endif %}
+          {% if post.author == request.user %}
+          <span><a href="{% url 'user_profile' %}">{{ post.author.first_name }}</a></span>
+          {% else %}
+              <span>{{ post.author.first_name }}</span>
+          {% endif %}
+      </p>
+      </div>
+  </div>
+</article>
 <!-- comment section -->
 
 <!-- Comments Form -->
@@ -49,7 +59,7 @@
             {% csrf_token %}
             <!-- Hidden input for parent comment.id -->
             <input type="hidden" name="parent_id" value="{{ comment.id }}">
-            <input class="btn btn-primary" type="submit" value="Replay">
+            <input class="btn btn-primary" type="submit" value="Reply">
 
         </form>
     </div>
